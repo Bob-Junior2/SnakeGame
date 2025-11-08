@@ -2,1176 +2,1476 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Ultimate Neon Snake 6.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PONG DIMENSION X</title>
     <style>
+        /* Import Orbitron font */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+        /* --- CORE VARIABLES & THEMES --- */
         :root {
-            /* Theme variables will be injected by CSS classes */
-            --page-bg: #0a0a0a;
-            --main-bg: #111;
-            --text-color: #0ff;
-            --text-shadow: 0 0 5px #0ff;
-            --border-color: #0ff;
-            --border-shadow-light: 0 0 5px var(--border-color), 0 0 10px var(--border-color);
-            --border-shadow-heavy: 0 0 10px var(--border-color), 0 0 20px var(--border-color), 0 0 30px var(--border-color);
-            --btn-bg: transparent;
-            --btn-text: var(--text-color);
-            --btn-border: var(--border-color);
-            --btn-hover-bg: var(--border-color);
-            --btn-hover-text: var(--main-bg);
+            --bg-color: #05050a;
+            --ui-bg: rgba(10, 10, 15, 0.85);
+            --text-color: #fff;
             --p1-color: #0ff;
-            --p2-color: #f00;
-        }
-        
-        /* --- THEME DEFINITIONS --- */
-        body.theme-neon {
-            --page-bg: #0a0a0a;
-            --main-bg: #111;
-            --text-color: #0ff;
-            --text-shadow: 0 0 5px #0ff;
-            --border-color: #0ff;
-            --p1-color: #0ff;
-            --p2-color: #f00;
-        }
-        body.theme-garden {
-            --page-bg: #3E5B25;
-            --main-bg: #67A13C;
-            --text-color: #F0E0B0;
-            --text-shadow: 0 0 5px #F0E0B0;
-            --border-color: #F0E0B0;
-            --btn-hover-text: #3E5B25;
-            --p1-color: #F0E0B0;
-            --p2-color: #C04A2A;
-        }
-        body.theme-ocean {
-            --page-bg: #001E3D;
-            --main-bg: #003060;
-            --text-color: #A0E0FF;
-            --text-shadow: 0 0 5px #A0E0FF;
-            --border-color: #A0E0FF;
-            --btn-hover-text: #001E3D;
-            --p1-color: #A0E0FF;
-            --p2-color: #FF6040;
+            --p1-health: #0ff;
+            --p2-color: #f0f;
+            --p2-health: #f0f;
+            --ball-color: #fff;
+            --accent-color: #0ff;
+            --grid-color: rgba(0, 255, 255, 0.05);
+            /* Use Orbitron as the primary font */
+            --font-main: 'Orbitron', 'Courier New', monospace;
+            --crt-opacity: 0.15;
         }
         body.theme-retro {
-            --page-bg: #222;
-            --main-bg: #333;
-            --text-color: #eee;
-            --text-shadow: 0 0 2px #eee;
-            --border-color: #eee;
-            --btn-hover-text: #222;
-            --p1-color: #0f0;
-            --p2-color: #f00;
+            --bg-color: #000; --ui-bg: rgba(0, 20, 0, 0.9); --text-color: #0f0;
+            --p1-color: #0f0; --p1-health: #0f0; --p2-color: #0f0; --p2-health: #0f0;
+            --ball-color: #0f0; --accent-color: #0f0; --grid-color: rgba(0, 255, 0, 0.1);
+            --crt-opacity: 0.3;
         }
-        /* --- END THEMES --- */
+        body.theme-candy {
+            --bg-color: #f0f4f8; --ui-bg: rgba(255, 255, 255, 0.8); --text-color: #5d5d8d;
+            --p1-color: #ff9ff3; --p1-health: #ff9ff3; --p2-color: #54a0ff; --p2-health: #54a0ff;
+            --ball-color: #5f27cd; --accent-color: #ff9ff3; --grid-color: rgba(0, 0, 0, 0.05);
+            --crt-opacity: 0.05;
+        }
+         body.theme-midnight {
+            --bg-color: #020024; --ui-bg: rgba(2, 0, 36, 0.8); --text-color: #a8c0ff;
+            --p1-color: #3f5efb; --p1-health: #3f5efb; --p2-color: #fc466b; --p2-health: #fc466b;
+            --ball-color: #fff; --accent-color: #fc466b; --grid-color: rgba(255, 255, 255, 0.03);
+            --crt-opacity: 0.1;
+        }
 
-
+        /* --- LAYOUT --- */
         body {
-            margin: 0;
-            padding: 0;
-            background: var(--page-bg);
-            color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            text-shadow: var(--text-shadow);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            background: #111; margin: 0; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; font-family: var(--font-main);
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin: 0.5rem;
-            animation: pulse-text 2s infinite;
+        #game-container {
+            position: relative; width: 1000px; height: 650px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
-
-        @keyframes pulse-text {
-            0% { text-shadow: var(--text-shadow); }
-            50% { text-shadow: 0 0 15px var(--text-color), 0 0 20px var(--text-color); }
-            100% { text-shadow: var(--text-shadow); }
-        }
-
-        #gameUI {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            min-height: 20px;
-        }
-        
-        #scoreUI-1P { display: flex; gap: 1.5rem; }
-        
-        #scoreUI-2P { display: none; gap: 1.5rem; }
-        #scoreUI-2P #score1Container { color: var(--p1-color); text-shadow: 0 0 5px var(--p1-color); }
-        #scoreUI-2P #score2Container { color: var(--p2-color); text-shadow: 0 0 5px var(--p2-color); }
-
-        #gameUI span {
-            color: #fff;
-            text-shadow: none;
-        }
-        
-        body.theme-retro #gameUI span { color: #eee; }
-        body.theme-garden #gameUI span { color: #fff; }
-        body.theme-ocean #gameUI span { color: #fff; }
-
-
         canvas {
-            background: var(--main-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            box-shadow: var(--border-shadow-heavy);
-            touch-action: none;
-            position: relative;
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            background: var(--bg-color); width: 100%; height: 100%;
+            display: block; border: 2px solid var(--accent-color);
+            box-sizing: border-box; transition: all 0.5s ease;
         }
-        
-        body.theme-retro canvas {
-            image-rendering: pixelated;
+        #crt-effect {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; opacity: var(--crt-opacity); z-index: 10;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 3px, 3px 100%; mix-blend-mode: overlay;
         }
 
-        #controls, #menuControls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        
-        /* Special grid for menu buttons */
-        #menuControls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-        }
-
-        button {
-            margin: 0.3rem;
-            padding: 0.7rem 1.2rem;
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            border: 2px solid var(--btn-border);
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1rem;
-            text-shadow: 0 0 5px var(--btn-text);
-            box-shadow: var(--border-shadow-light);
-            transition: all 0.2s ease;
-        }
-
-        button:hover, button:focus {
-            background: var(--btn-hover-bg);
-            color: var(--btn-hover-text);
-            text-shadow: none;
-            box-shadow: var(--border-shadow-heavy);
-        }
-
-        button.red-btn {
-            color: var(--p2-color);
-            border-color: var(--p2-color);
-            text-shadow: 0 0 5px var(--p2-color);
-            box-shadow: 0 0 5px var(--p2-color), 0 0 10px var(--p2-color);
-        }
-        button.red-btn:hover, button.red-btn:focus {
-            background: var(--p2-color);
-            color: var(--main-bg);
-        }
-
-        button:disabled {
-            color: #555;
-            border-color: #555;
-            text-shadow: none;
-            box-shadow: none;
-            cursor: not-allowed;
-            background: transparent;
-        }
-
-        /* Overlays */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        /* --- UI SCREENS --- */
+        .ui-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--ui-bg); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 20;
+            transition: opacity 0.4s ease, visibility 0.4s;
             color: var(--text-color);
-            text-align: center;
-            padding: 1rem;
             box-sizing: border-box;
-            z-index: 10;
         }
+        .ui-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        h1 {
+            font-size: 60px; margin: 0 0 10px 0; letter-spacing: 8px;
+            text-transform: uppercase; text-align: center;
+            text-shadow: 3px 3px 0px var(--p2-color), -3px -3px 0px var(--p1-color);
+        }
+        h2 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+        .subtitle { opacity: 0.7; margin-bottom: 10px; font-size: 18px; }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        button {
+            background: transparent; border: 2px solid var(--accent-color);
+            color: var(--text-color); padding: 10px 15px;
+            font-size: 14px; font-family: var(--font-main);
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+            transition: all 0.2s ease; min-width: 200px;
+        }
+        button:hover, button.active {
+            background: var(--accent-color); color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+        .theme-ribbon { display: flex; gap: 10px; margin-bottom: 10px; }
+        .theme-swatch {
+            width: 25px; height: 25px; border-radius: 50%;
+            cursor: pointer; border: 3px solid rgba(255,255,255,0.2);
+            transition: transform 0.2s;
+        }
+        .theme-swatch:hover, .theme-swatch.active {
+            transform: scale(1.2); border-color: var(--text-color);
+        }
+        .menu-label { opacity: 0.8; margin-top: 10px; margin-bottom: 8px; font-size: 14px; }
+        .menu-row { display: flex; gap: 10px; }
         
-        body.theme-retro .overlay { background: rgba(0,0,0,0.95); }
-        body.theme-garden .overlay { background: rgba(40, 60, 20, 0.95); }
-        body.theme-ocean .overlay { background: rgba(0, 20, 40, 0.95); }
-
-        #pauseOverlay { display: none; }
-        #gameOverOverlay { display: none; }
-        #winnerOverlay { display: none; }
-        #instructionsOverlay { display: none; }
-        #menuOverlay { display: flex; } /* Start on menu */
-
-        .overlay h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--p2-color);
-            text-shadow: 0 0 10px var(--p2-color);
+        /* Styles for instructions popup */
+        .instructions-content {
+            text-align: left; max-width: 800px;
+            padding: 0 20px; font-size: 14px; line-height: 1.6;
+            max-height: 400px; overflow-y: auto;
+            display: flex; gap: 30px;
         }
-        
-        #instructionsOverlay h2 {
-             color: var(--text-color);
-            text-shadow: 0 0 10px var(--text-color);
-        }
-
-        .overlay ul {
-            text-align: left;
+        #instructions ul {
             list-style: none;
-            padding: 0;
-            max-width: 450px;
+            padding-left: 0;
+            margin-top: 5px;
         }
-        
-        .overlay ul li {
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
+        #instructions li {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 8px;
+            margin-bottom: 5px;
+            border-left: 3px solid var(--accent-color);
         }
-        
-        .overlay ul li strong {
-            display: inline-block;
-            min-width: 130px; /* Aligns the descriptions */
-        }
-        
-        /* Food/Power-up colors in instructions */
-        .li-red strong { color: #f00; }
-        .li-gold strong { color: #ff0; }
-        .li-blue strong { color: #00f; }
-        .li-pink strong { color: #f0f; }
-        .li-green strong { color: #0f0; }
-        .li-orange strong { color: #f80; }
-        .li-cyan-light strong { color: #0ef; }
-        .li-purple-dark strong { color: #404; }
-        .li-purple strong { color: #808; }
-
-
-        #finalScore {
-            font-size: 2rem;
-            margin: 1rem;
-        }
-        
-        #winnerMessage {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        #newHighScore {
-            font-size: 2.5rem;
-            color: #ff0; /* Gold */
-            text-shadow: 0 0 10px #ff0;
-            animation: pulse-text-gold 1.5s infinite;
-        }
-        
-        @keyframes pulse-text-gold {
-            0% { text-shadow: 0 0 5px #ff0; }
-            50% { text-shadow: 0 0 15px #ff0, 0 0 20px #ff0; }
-            100% { text-shadow: 0 0 5px #ff0; }
-        }
-        
-        /* Toast Notifications */
-        #toastContainer {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        
-        .toast {
-            background: var(--text-color);
-            color: var(--page-bg);
-            padding: 1rem;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 1rem;
-            text-shadow: none;
-            box-shadow: var(--border-shadow-heavy);
-            animation: slide-in 0.5s ease, fade-out 0.5s ease 3s forwards;
-        }
-        
-        @keyframes slide-in {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes fade-out {
-            from { opacity: 1; }
-            to { opacity: 0; transform: translateX(100%); }
-        }
-
     </style>
 </head>
-<body class="theme-neon"> <!-- Default theme class -->
+<body>
 
-    <h1>Ultimate Neon Snake</h1>
+<div id="game-container">
+    <canvas id="gameCanvas" width="1000" height="650"></canvas>
+    <div id="crt-effect"></div>
 
-    <div id="gameUI">
-        <!-- 1 Player UI -->
-        <div id="scoreUI-1P">
-            <div>Score: <span id="score">0</span></div>
-            <div>High Score: <span id="highScore">0</span></div>
-            <div>Level: <span id="level">1</span></div>
-            <div>Time: <span id="timer">0</span>s</div>
+    <div id="main-menu" class="ui-screen">
+        <h1>PONG DIMENSION X</h1>
+        <div class="subtitle">ULTIMATE EDITION</div>
+        
+        <div class="menu-label">THEME</div>
+        <div class="theme-ribbon" id="themeSelector">
+            <div class="theme-swatch active" data-theme="" style="background: linear-gradient(45deg, #0ff, #f0f);"></div>
+            <div class="theme-swatch" data-theme="theme-retro" style="background: #0f0;"></div>
+            <div class="theme-swatch" data-theme="theme-candy" style="background: linear-gradient(45deg, #ff9ff3, #54a0ff);"></div>
+            <div class="theme-swatch" data-theme="theme-midnight" style="background: linear-gradient(45deg, #020024, #3f5efb);"></div>
         </div>
-        <!-- 2 Player UI -->
-        <div id="scoreUI-2P">
-            <div id="score1Container">P1 Score: <span id="score1">0</span></div>
-            <div id="score2Container">P2 Score: <span id="score2">0</span></div>
+
+        <div class="menu-label">ARENA</div>
+        <div class="menu-row">
+            <button id="arena-classic" class="arena-btn active" onclick="Game.selectSetting('arena', 'classic')">Classic</button>
+            <button id="arena-obstacle" class="arena-btn" onclick="Game.selectSetting('arena', 'obstacle')">Obstacle</button>
+            <button id="arena-gravity" class="arena-btn" onclick="Game.selectSetting('arena', 'gravity')">Gravity</button>
+            <button id="arena-pinball" class="arena-btn" onclick="Game.selectSetting('arena', 'pinball')">Pinball</button>
+        </div>
+        
+        <div class="menu-label">GAME MODE</div>
+        <div class="menu-row">
+            <button id="mode-health" class="mode-btn active" onclick="Game.selectSetting('mode', 'health')">Health</button>
+            <button id="mode-classic" class.mode-btn" onclick="Game.selectSetting('mode', 'classic')">Classic</button>
+            <button id="mode-timed" class="mode-btn" onclick="Game.selectSetting('mode', 'timed')">Timed</button>
+            <button id="mode-sudden" class="mode-btn" onclick="Game.selectSetting('mode', 'sudden')">Sudden Death</button>
+        </div>
+        
+        <div class="menu-label">AI DIFFICULTY (FOR 1P)</div>
+        <div class="menu-row">
+            <button id="ai-easy" class="ai-btn active" onclick="Game.selectSetting('ai', 'easy')">Easy</button>
+            <button id="ai-medium" class="ai-btn" onclick="Game.selectSetting('ai', 'medium')">Medium</button>
+            <button id="ai-hard" class="ai-btn" onclick="Game.selectSetting('ai', 'hard')">Hard</button>
+        </div>
+
+        <div class="menu-row" style="margin-top: 20px;">
+            <button onclick="Game.start('1P')">1 PLAYER (vs AI)</button>
+            <button onclick="Game.start('2P')">2 PLAYER (Local)</button>
+        </div>
+        <div class="menu-row" style="margin-top: 10px;">
+             <button onclick="Game.showInstructions(true, false)" style="min-width: 410px;">How to Play</button>
+        </div>
+        <div style="font-size: 12px; opacity: 0.6; margin-top: 10px; text-align: center;">
+            Press ESC to Pause
         </div>
     </div>
 
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-
-    <div id="controls">
-        <button id="pauseBtn" disabled>Pause</button>
-        <button id="resetBtn" disabled>Reset Game</button>
-        <button id="wrapBtn">Wrap: ON</button>
-        <button id="paletteBtn">Palette: Neon</button>
-        <button id="showInstrBtn">Instructions</button>
-    </div>
-    
-    <!-- Overlays -->
-    <div id="menuOverlay" class="overlay">
-        <h2>Select Mode</h2>
-        <!-- NEW MENU LAYOUT -->
-        <div id="menuControls">
-            <button id="modeSoloClassicBtn">Solo Classic</button>
-            <button id="modeSoloTimeAttackBtn">Time Attack (1P)</button>
-            <button id="modeVersus2PBtn">Versus (2P)</button>
-            <button id="modeTron2PBtn">Tron (2P)</button>
+    <div id="game-over" class="ui-screen hidden">
+        <h1 id="winner-text">PLAYER 1 WINS</h1>
+        <div class="btn-group">
+            <button onclick="Game.showMenu()">MENU</button>
+            <button onclick="Game.restart()">REMATCH</button>
         </div>
-        <button id="difficultyBtn" style="margin-top: 1rem;">Difficulty: Normal</button>
-        <p style="font-size: 1rem; margin-top: 1rem;">
-            1P: Arrow Keys | 2P: WASD & Arrow Keys
-        </p>
     </div>
 
-    <div id="pauseOverlay" class="overlay">
-        <h1>PAUSED</h1>
-        <button id="resumeBtn">Resume</button>
-    </div>
-
-    <div id="gameOverOverlay" class="overlay">
-        <h2>GAME OVER</h2>
-        <div id="finalScore">Score: 0</div>
-        <div id="newHighScore" style="display: none;">🎉 NEW HIGH SCORE! 🎉</div>
-        <button id="restartBtn">Play Again</button>
-        <button id="menuBtn">Main Menu</button>
-    </div>
-    
-    <div id="winnerOverlay" class="overlay">
-        <h2 id="winnerMessage"></h2>
-        <button id="restartBtn2P">Play Again</button>
-        <button id="menuBtn2P">Main Menu</button>
-    </div>
-    
-    <div id="instructionsOverlay" class="overlay">
-        <h2>How to Play</h2>
-        <ul>
-            <li><strong>Controls (1P):</strong> Arrow Keys to move.</li>
-            <li><strong>Controls (2P):G</strong> P1 uses WASD, P2 uses Arrow Keys.</li>
-            <li><strong>Goal:</strong> Varies by mode! Survive, get a high score, or trap your opponent.</li>
-            <li class="li-purple"><strong>Moving Blocks:</strong> Avoid these! They move on their own (except in Tron).</li>
-            <li class="li-red"><strong>Red Food:</strong> +1 point (No food in Tron).</li>
-            <li class="li-gold"><strong>Gold Food:</strong> +5 points, slows game.</li>
-            <li class="li-blue"><strong>Blue Food:</strong> +1 point, 5s invincibility.</li>
-            <li class="li-cyan-light"><strong>Cyan Power-up:</strong> 2x Score for 10s.</li>
-            <li class="li-orange"><strong>Orange Power-up:</strong> 1-hit shield.</li>
-            <li class="li-green"><strong>Green Power-up:</strong> Shrinks snake by 3.</li>
-            <li class="li-pink"><strong>Pink Power-up:</strong> Reverses controls for 7s.</li>
-            <li class="li-purple-dark"><strong>Dark Curse:</strong> Blinds you for 7s!</li>
-        </ul>
-        <button id="closeInstrBtn">Close</button>
-    </div>
-    
-    <!-- Achievement Notifications -->
-    <div id="toastContainer"></div>
-
-    <script>
-        // ===== Setup =====
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        const gridSize = 20, canvasSize = 400, box = canvasSize / gridSize;
-
-        // ===== THEME DATA =====
-        const themes = {
-            'neon': {
-                name: "Neon", cssClass: 'theme-neon', bg: '#111', grid: 'rgba(0, 255, 255, 0.1)',
-                p1: { head: '#0ff', retroHead: '#0A0', retroBody: '#080', hueStart: 180 },
-                p2: { head: '#f60', retroHead: '#D00', retroBody: '#B00', hueStart: 30 },
-                food: { red: '#f00', gold: '#ff0', blue: '#00f' },
-                pu: { shrink: '#0f0', reverse: '#f0f', shield: '#f80', scoreDoubler: '#0ef', darkness: '#404' },
-                obstacle: '#808', invincible: '#fff'
-            },
-            'garden': {
-                name: "Garden", cssClass: 'theme-garden', bg: '#67A13C', grid: 'rgba(0, 0, 0, 0.1)',
-                p1: { head: '#3A5C2A', retroHead: '#3A5C2A', retroBody: '#4B7337', hueStart: 100 },
-                p2: { head: '#C04A2A', retroHead: '#C04A2A', retroBody: '#A03F23', hueStart: 20 },
-                food: { red: '#E01E10', gold: '#F0C000', blue: '#60A0FF' },
-                pu: { shrink: '#804000', reverse: '#E080D0', shield: '#F0E0B0', scoreDoubler: '#FFFF80', darkness: '#222' },
-                obstacle: '#503010', invincible: '#fff'
-            },
-            'ocean': {
-                name: "Ocean", cssClass: 'theme-ocean', bg: '#001E3D', grid: 'rgba(100, 200, 255, 0.1)',
-                p1: { head: '#30C0FF', retroHead: '#30C0FF', retroBody: '#20A0DD', hueStart: 190 },
-                p2: { head: '#FF6040', retroHead: '#FF6040', retroBody: '#DD5030', hueStart: 10 },
-                food: { red: '#FF8000', gold: '#FFFF00', blue: '#80FFC0' },
-                pu: { shrink: '#C0FF80', reverse: '#FF80C0', shield: '#F0F0F0', scoreDoubler: '#C0FFFF', darkness: '#111' },
-                obstacle: '#404060', invincible: '#fff'
-            },
-            'retro': {
-                name: "Retro", cssClass: 'theme-retro', bg: '#222', grid: '#444',
-                p1: { head: '#0A0', retroHead: '#0A0', retroBody: '#080', hueStart: 120 },
-                p2: { head: '#D00', retroHead: '#D00', retroBody: '#B00', hueStart: 0 },
-                food: { red: '#f00', gold: '#ff0', blue: '#00f' },
-                pu: { shrink: '#0f0', reverse: '#f0f', shield: '#f80', scoreDoubler: '#0ef', darkness: '#404' },
-                obstacle: '#888', invincible: '#fff'
-            }
-        };
-        let themeKeys = Object.keys(themes);
-        let currentThemeKey = 'neon';
-        // ===== END THEME DATA =====
-
-        // Game State
-        let snake1, snake2, direction1, direction2, nextDirection1, nextDirection2;
-        let food, powerUps, obstacles, snakeTrail1, snakeTrail2;
-        let score1, score2, level, gameRunning, gameOver, wrapAround;
-        let moveInterval, lastUpdateTime, gameLoopId, startTime, timer, pauseTimestamp;
-        let lastTimerUpdateTime = 0, lastObstacleUpdateTime = 0;
-        const obstacleMoveInterval = 450;
-        let gameMode = 'menu'; // 'menu', 'solo_classic', 'solo_time_attack', 'versus_2p', 'tron_2p'
-        let difficulty = 'normal';
-        const timeAttackDuration = 90000; // 90 seconds
-        
-        let p1 = {}, p2 = {};
-        
-        // UI Elements
-        const score1El = document.getElementById("score1"), score2El = document.getElementById("score2");
-        const scoreUI1P = document.getElementById("scoreUI-1P"), scoreUI2P = document.getElementById("scoreUI-2P");
-        const scoreEl = document.getElementById("score"), highScoreEl = document.getElementById("highScore");
-        const levelEl = document.getElementById("level"), timerEl = document.getElementById("timer");
-        const pauseBtn = document.getElementById("pauseBtn"), resetBtn = document.getElementById("resetBtn");
-        const wrapBtn = document.getElementById("wrapBtn"), paletteBtn = document.getElementById("paletteBtn");
-        const showInstrBtn = document.getElementById("showInstrBtn"), closeInstrBtn = document.getElementById("closeInstrBtn");
-        const menuOverlay = document.getElementById("menuOverlay"), pauseOverlay = document.getElementById("pauseOverlay");
-        const gameOverOverlay = document.getElementById("gameOverOverlay"), winnerOverlay = document.getElementById("winnerOverlay");
-        const instructionsOverlay = document.getElementById("instructionsOverlay");
-        
-        // NEW Menu Buttons
-        const modeSoloClassicBtn = document.getElementById("modeSoloClassicBtn");
-        const modeSoloTimeAttackBtn = document.getElementById("modeSoloTimeAttackBtn");
-        const modeVersus2PBtn = document.getElementById("modeVersus2PBtn");
-        const modeTron2PBtn = document.getElementById("modeTron2PBtn");
-        
-        const difficultyBtn = document.getElementById("difficultyBtn"), resumeBtn = document.getElementById("resumeBtn");
-        const restartBtn = document.getElementById("restartBtn"), menuBtn = document.getElementById("menuBtn");
-        const restartBtn2P = document.getElementById("restartBtn2P"), menuBtn2P = document.getElementById("menuBtn2P");
-        const winnerMessageEl = document.getElementById("winnerMessage");
-        const finalScoreEl = document.getElementById("finalScore"), newHighScoreEl = document.getElementById("newHighScore");
-        const toastContainer = document.getElementById("toastContainer");
-
-        let highScore = localStorage.getItem("snakeHighScore") ? parseInt(localStorage.getItem("snakeHighScore")) : 0;
-        highScoreEl.textContent = highScore;
-        let achievements = new Set(JSON.parse(localStorage.getItem("snakeAchievements")) || []);
-
-        // ===== Game Initialization =====
-        function resetPowerUpStates(player) {
-            player.isInvincible = false, player.invincibleTimer = 0;
-            player.controlsReversed = false, player.reverseTimer = 0;
-            player.hasShield = false;
-            player.isScoreDoubled = false, player.scoreDoublerTimer = 0;
-            player.isDarkness = false, player.darknessTimer = 0;
-        }
-
-        function initGame(mode) {
-            gameMode = mode;
-            
-            // Set base speed
-            switch(difficulty) {
-                case 'easy': moveInterval = 200; break;
-                case 'hard': moveInterval = 100; break;
-                default: moveInterval = 150;
-            }
-            // Tron mode has a constant speed
-            if (gameMode === 'tron_2p') {
-                 moveInterval = (difficulty === 'easy') ? 150 : 120;
-            }
-
-            snake1 = [{ x: 5, y: 10 }];
-            direction1 = { x: 1, y: 0 };
-            nextDirection1 = { x: 1, y: 0 };
-            snakeTrail1 = [], score1 = 0;
-            resetPowerUpStates(p1);
-
-            snake2 = [], snakeTrail2 = [], score2 = 0;
-            resetPowerUpStates(p2);
-            
-            const is2P = (gameMode === 'versus_2p' || gameMode === 'tron_2p');
-            
-            if (is2P) {
-                snake2 = [{ x: 14, y: 10 }];
-                direction2 = { x: -1, y: 0 };
-                nextDirection2 = { x: -1, y: 0 };
-            }
-            
-            obstacles = [], powerUps = [], gameRunning = false, gameOver = false, wrapAround = true;
-            startTime = Date.now(), timer = 0, level = 1;
-
-            if (gameMode === 'solo_classic' || gameMode === 'solo_time_attack') {
-                scoreUI1P.style.display = 'flex'; scoreUI2P.style.display = 'none';
-                scoreEl.textContent = "0"; 
-                if (gameMode === 'solo_time_attack') {
-                    levelEl.textContent = "ATK";
-                    timerEl.textContent = (timeAttackDuration / 1000) + "s";
-                } else {
-                    levelEl.textContent = "1";
-                    timerEl.textContent = "0s";
-                }
-            } else {
-                scoreUI1P.style.display = 'none'; scoreUI2P.style.display = 'flex';
-                score1El.textContent = "0"; score2El.textContent = "0";
-            }
-            
-            pauseBtn.disabled = true; pauseBtn.textContent = "Pause";
-            resetBtn.disabled = true;
-            menuOverlay.style.display = "none"; gameOverOverlay.style.display = "none";
-            winnerOverlay.style.display = "none"; pauseOverlay.style.display = "none";
-
-            // Spawn items based on mode
-            if (gameMode !== 'tron_2p') {
-                spawnFood();
-                for (let i = 0; i < 3; i++) { spawnObstacle(); }
-            } else {
-                // Spawn a few obstacles for Tron
-                for (let i = 0; i < 5; i++) { spawnObstacle(); }
-            }
-            drawGame();
-        }
-
-        function startGame() {
-            if (gameRunning || gameOver) return;
-            gameRunning = true, gameOver = false;
-            startTime = performance.now();
-            lastUpdateTime = performance.now();
-            lastTimerUpdateTime = performance.now();
-            lastObstacleUpdateTime = performance.now();
-            pauseBtn.disabled = false, resetBtn.disabled = false;
-            
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
-
-        // ===== Spawning Functions =====
-        function getEmptyCell() {
-            let cell;
-            while (true) {
-                cell = {
-                    x: Math.floor(Math.random() * gridSize),
-                    y: Math.floor(Math.random() * gridSize)
-                };
-                let occupied = snake1.some(s => s.x === cell.x && s.y === cell.y) ||
-                               snake2.some(s => s.x === cell.x && s.y === cell.y) ||
-                               obstacles.some(o => o.x === cell.x && o.y === cell.y) ||
-                               (food && food.x === cell.x && food.y === cell.y) ||
-                               powerUps.some(p => p.x === cell.x && p.y === cell.y);
-                if (!occupied) return cell;
-            }
-        }
-
-        function spawnFood() {
-            if (gameMode === 'tron_2p') return;
-            const types = [
-                { type: 'red', points: 1, effect: null },
-                { type: 'red', points: 1, effect: null },
-                { type: 'gold', points: 5, effect: "slow" },
-                { type: 'blue', points: 1, effect: "invincible" }
-            ];
-            const type = types[Math.floor(Math.random() * types.length)];
-            food = { ...getEmptyCell(), ...type };
-        }
-
-        function spawnObstacle() {
-            if (obstacles.length >= 10) return;
-            const cell = getEmptyCell();
-            let moveDir;
-            if (Math.random() > 0.5) moveDir = { x: (Math.random() > 0.5) ? 1 : -1, y: 0 };
-            else moveDir = { x: 0, y: (Math.random() > 0.5) ? 1 : -1 };
-            obstacles.push({ x: cell.x, y: cell.y, dir: moveDir });
-        }
-
-
-        function spawnPowerUp() {
-            if (gameMode === 'tron_2p' || powerUps.length < 3) return;
-            const types = [
-                { type: 'shrink', effect: "shrink" },   
-                { type: 'reverse', effect: "reverse" },   
-                { type: 'shield', effect: "shield" },  
-                { type: 'scoreDoubler', effect: "scoreDoubler" },
-                { type: 'darkness', effect: "darkness" }
-            ];
-            const type = types[Math.floor(Math.random() * types.length)];
-            powerUps.push({ ...getEmptyCell(), ...type });
-        }
-
-        // ===== Drawing Functions =====
-        function drawGame() {
-            const theme = themes[currentThemeKey];
-            ctx.imageSmoothingEnabled = false;
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = theme.bg;
-            ctx.fillRect(0, 0, canvasSize, canvasSize);
-
-            ctx.strokeStyle = theme.grid;
-            for (let i = 0; i <= gridSize; i++) {
-                ctx.beginPath(); ctx.moveTo(i * box, 0); ctx.lineTo(i * box, canvasSize); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(0, i * box); ctx.lineTo(canvasSize, i * box); ctx.stroke();
-            }
-
-            if (currentThemeKey === 'retro') drawRetro();
-            else drawNeon();
-            
-            if (p1.isDarkness) drawDarkness(snake1[0]);
-            if (p2.isDarkness) drawDarkness(snake2[0]);
-            ctx.shadowBlur = 0;
-        }
-        
-        function drawNeon() {
-            const theme = themes[currentThemeKey];
-            const pulse = Math.abs(Math.sin(Date.now() / 200)) * 10 + 10;
-            drawTrail(snakeTrail1);
-            if (gameMode === 'versus_2p' || gameMode === 'tron_2p') drawTrail(snakeTrail2);
-            if (food) drawItem(theme.food[food.type], food.x, food.y, pulse);
-            powerUps.forEach(pu => drawItem(theme.pu[pu.type], pu.x, pu.y, pulse));
-            obstacles.forEach(o => drawItem(theme.obstacle, o.x, o.y, 10));
-            ctx.shadowBlur = 0;
-            drawSnake(snake1, p1, 'neon', 1);
-            if (gameMode === 'versus_2p' || gameMode === 'tron_2p') drawSnake(snake2, p2, 'neon', 2);
-        }
-
-        function drawRetro() {
-            const theme = themes[currentThemeKey];
-            if (food) drawItem(theme.food[food.type], food.x, food.y, 0, true);
-            powerUps.forEach(pu => drawItem(theme.pu[pu.type], pu.x, pu.y, 0, true));
-            obstacles.forEach(o => drawItem(theme.obstacle, o.x, o.y, 0, true));
-            drawSnake(snake1, p1, 'retro', 1);
-            if (gameMode === 'versus_2p' || gameMode === 'tron_2p') drawSnake(snake2, p2, 'retro', 2);
-        }
-        
-        function drawItem(color, x, y, pulse, isRetro = false) {
-            ctx.fillStyle = color;
-            if (!isRetro) {
-                ctx.shadowColor = color;
-                ctx.shadowBlur = pulse;
-            }
-            ctx.fillRect(x * box, y * box, box, box);
-        }
-
-        function drawTrail(trail) {
-            trail.forEach((seg, i) => {
-                ctx.fillStyle = `rgba(0, 255, 255, ${0.05 * i})`;
-                ctx.fillRect(seg.x * box, seg.y * box, box, box);
-            });
-        }
-
-        function drawSnake(snake, playerState, style, playerNum) {
-            const theme = themes[currentThemeKey];
-            const colors = (playerNum === 1) ? theme.p1 : theme.p2;
-            
-            snake.forEach((seg, i) => {
-                if (style === 'retro') {
-                    if (i === 0) {
-                        ctx.fillStyle = playerState.isInvincible ? theme.invincible : (playerState.isScoreDoubled ? theme.pu.scoreDoubler : colors.retroHead);
-                    } else {
-                        ctx.fillStyle = colors.retroBody;
-                    }
-                    ctx.fillRect(seg.x * box, seg.y * box, box, box);
-                    
-                    if (i === 0 && playerState.hasShield) {
-                        ctx.strokeStyle = theme.pu.shield;
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(seg.x * box + 1, seg.y * box + 1, box - 2, box - 2);
-                    }
-                } else {
-                    if (i === 0) {
-                        ctx.fillStyle = playerState.isInvincible ? theme.invincible : (playerState.isScoreDoubled ? theme.pu.scoreDoubler : colors.head);
-                        ctx.shadowColor = playerState.isInvincible ? theme.invincible : (playerState.isScoreDoubled ? theme.pu.scoreDoubler : colors.head);
-                        ctx.shadowBlur = 15;
-                    } else {
-                        const hue = (colors.hueStart + i * 10 + Date.now() / 20) % 360;
-                        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                        ctx.shadowBlur = 0;
-                    }
-                    ctx.fillRect(seg.x * box + 1, seg.y * box + 1, box - 2, box - 2);
-
-                    if (i === 0 && playerState.hasShield) {
-                        ctx.strokeStyle = theme.pu.shield;
-                        ctx.lineWidth = 2;
-                        ctx.shadowColor = theme.pu.shield;
-                        ctx.shadowBlur = 15;
-                        ctx.strokeRect(seg.x * box, seg.y * box, box, box);
-                    }
-                }
-                ctx.lineWidth = 1;
-                ctx.shadowBlur = 0;
-            });
-        }
-        
-        function drawDarkness(head) {
-            const x = head.x * box + box / 2;
-            const y = head.y * box + box / 2;
-            const radius = 80;
-            ctx.save();
-            ctx.fillStyle = "#000";
-            ctx.beginPath();
-            ctx.rect(0, 0, canvasSize, canvasSize);
-            ctx.arc(x, y, radius, 0, Math.PI * 2, true);
-            ctx.clip("evenodd");
-            ctx.fillRect(0, 0, canvasSize, canvasSize);
-            ctx.restore();
-        }
-
-        // ===== Game Logic =====
-        function updateGame() {
-            if (!gameRunning || gameOver) return;
-            
-            let p1Head, p2Head, p1Crashed, p2Crashed;
-            const is2P = (gameMode === 'versus_2p' || gameMode === 'tron_2p');
-            
-            // P1 Logic
-            direction1 = nextDirection1;
-            p1Head = getNextHead(snake1[0], direction1, p1.controlsReversed);
-            handleWrap(p1Head);
-            snakeTrail1.push({ ...snake1[0] });
-            if (snakeTrail1.length > 10) snakeTrail1.shift();
-            
-            // P2 Logic
-            if (is2P) {
-                direction2 = nextDirection2;
-                p2Head = getNextHead(snake2[0], direction2, p2.controlsReversed);
-                handleWrap(p2Head);
-                snakeTrail2.push({ ...snake2[0] });
-                if (snakeTrail2.length > 10) snakeTrail2.shift();
-            }
-            
-            // Collision Detection
-            p1Crashed = checkCollisions(p1Head, snake1, (is2P ? snake2 : null), p1);
-            if (is2P) {
-                p2Crashed = checkCollisions(p2Head, snake2, snake1, p2);
-            }
-            
-            // Game Over Logic
-            if (gameMode === 'solo_classic' || gameMode === 'solo_time_attack') {
-                if (p1Crashed) { showGameOver(score1); return; }
-            } else if (is2P) {
-                if (p1Crashed && p2Crashed) showWinner('draw');
-                else if (p1Crashed) showWinner('p2');
-                else if (p2Crashed) showWinner('p1');
-                if (p1Crashed || p2Crashed) return;
-            }
-
-            // Movement & Eating
-            updateSnake(snake1, p1Head, p1, 1);
-            if (is2P) updateSnake(snake2, p2Head, p2, 2);
-        }
-        
-        function updateObstacles() {
-            if (gameMode === 'tron_2p') return; // No moving obstacles in Tron
-            for (const obstacle of obstacles) {
-                let nextX = obstacle.x + obstacle.dir.x;
-                let nextY = obstacle.y + obstacle.dir.y;
-                if (!wrapAround && (nextX < 0 || nextX >= gridSize || nextY < 0 || nextY >= gridSize)) {
-                    obstacle.dir.x *= -1; obstacle.dir.y *= -1;
-                } 
-                else if (obstacles.some(o => o !== obstacle && o.x === nextX && o.y === nextY)) {
-                    obstacle.dir.x *= -1; obstacle.dir.y *= -1;
-                }
-                else if ((food && food.x === nextX && food.y === nextY) || powerUps.some(p => p.x === nextX && p.y === nextY)) {
-                    obstacle.dir.x *= -1; obstacle.dir.y *= -1;
-                }
-                else {
-                    obstacle.x += obstacle.dir.x; obstacle.y += obstacle.dir.y;
-                    if (wrapAround) {
-                        if (obstacle.x < 0) obstacle.x = gridSize - 1;
-                        if (obstacle.x >= gridSize) obstacle.x = 0;
-                        if (obstacle.y < 0) obstacle.y = gridSize - 1;
-                        if (obstacle.y >= gridSize) obstacle.y = 0;
-                    }
-                }
-            }
-        }
-
-        function getNextHead(head, direction, reversed) {
-            let newHead = { x: head.x, y: head.y };
-            if (reversed) {
-                newHead.x -= direction.x; newHead.y -= direction.y;
-            } else {
-                newHead.x += direction.x; newHead.y += direction.y;
-            }
-            return newHead;
-        }
-
-        function handleWrap(head) {
-            if (wrapAround) {
-                if (head.x < 0) head.x = gridSize - 1;
-                if (head.x >= gridSize) head.x = 0;
-                if (head.y < 0) head.y = gridSize - 1;
-                if (head.y >= gridSize) head.y = 0;
-            }
-        }
-        
-        function checkCollisions(head, ownSnake, otherSnake, playerState) {
-            // Wall
-            if (!wrapAround && (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize)) {
-                if (playerState.hasShield) { playerState.hasShield = false; addAchievement("Shield Used!"); return false; }
-                return true;
-            }
-            if (playerState.isInvincible) return false;
-            // Obstacle
-            if (obstacles.some(o => o.x === head.x && o.y === head.y)) {
-                if (playerState.hasShield) { playerState.hasShield = false; addAchievement("Shield Used!"); return false; }
-                return true;
-            }
-            // Self
-            if (ownSnake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
-                if (playerState.hasShield) { playerState.hasShield = false; addAchievement("Shield Used!"); return false; }
-                return true;
-            }
-            // Other snake
-            if (otherSnake && otherSnake.some(s => s.x === head.x && s.y === head.y)) {
-                if (playerState.hasShield) { playerState.hasShield = false; addAchievement("Shield Used!"); return false; }
-                return true;
-            }
-            return false;
-        }
-
-        function updateSnake(snake, head, playerState, playerNum) {
-            snake.unshift(head);
-            let ateFood = false;
-
-            if (food && head.x === food.x && head.y === food.y) {
-                ateFood = true;
-                let pointsToAdd = food.points;
-                if (playerState.isScoreDoubled) pointsToAdd *= 2;
-                if (playerNum === 1) score1 += pointsToAdd; else score2 += pointsToAdd;
-                updateScores();
-                if (gameMode !== 'versus_2p') checkAchievements();
-                if (food.effect === "slow") moveInterval = Math.min(250, moveInterval + 50);
-                if (food.effect === "invincible") {
-                    playerState.isInvincible = true; playerState.invincibleTimer = 5000;
-                    if (gameMode !== 'versus_2p') addAchievement("Invincible!");
-                }
-                food = null;
-                spawnFood();
-                if (gameMode !== 'versus_2p' && score1 > 0 && score1 % 5 === 0) levelUp();
-            }
-            
-            powerUps.forEach((pu, i) => {
-                if (head.x === pu.x && head.y === pu.y) {
-                    ateFood = true;
-                    if (pu.effect === "shrink") {
-                        snake.length = Math.max(1, snake.length - 3);
-                        if (gameMode !== 'versus_2p') addAchievement("Shrunk!");
-                    }
-                    if (pu.effect === "reverse") {
-                        playerState.controlsReversed = true; playerState.reverseTimer = 7000;
-                        if (gameMode !== 'versus_2p') addAchievement("Controls Reversed!");
-                    }
-                    if (pu.effect === "shield") {
-                        playerState.hasShield = true;
-                        if (gameMode !== 'versus_2p') addAchievement("Shields Up!");
-                    }
-                    if (pu.effect === "scoreDoubler") {
-                        playerState.isScoreDoubled = true; playerState.scoreDoublerTimer = 10000;
-                        if (gameMode !== 'versus_2p') addAchievement("2x Score!");
-                    }
-                    if (pu.effect === "darkness") {
-                        playerState.isDarkness = true; playerState.darknessTimer = 7000;
-                        if (gameMode !== 'versus_2p') addAchievement("Lights Out!");
-                    }
-                    powerUps.splice(i, 1);
-                }
-            });
-            // TRON MODE LOGIC: Never pop the tail.
-            if (!ateFood && gameMode !== 'tron_2p') snake.pop();
-        }
-        
-        function updateScores() {
-            if (gameMode === 'solo_classic' || gameMode === 'solo_time_attack') scoreEl.textContent = score1;
-            else { score1El.textContent = score1; score2El.textContent = score2; }
-        }
-
-        function updatePowerUpTimers(delta) {
-            function updateTimer(player, timerKey, stateKey) {
-                if (player[stateKey]) {
-                    player[timerKey] -= delta;
-                    if (player[timerKey] <= 0) { player[stateKey] = false; player[timerKey] = 0; }
-                }
-            }
-            updateTimer(p1, 'invincibleTimer', 'isInvincible');
-            updateTimer(p1, 'reverseTimer', 'controlsReversed');
-            updateTimer(p1, 'scoreDoublerTimer', 'isScoreDoubled');
-            updateTimer(p1, 'darknessTimer', 'isDarkness');
-            updateTimer(p2, 'invincibleTimer', 'isInvincible');
-            updateTimer(p2, 'reverseTimer', 'controlsReversed');
-            updateTimer(p2, 'scoreDoublerTimer', 'isScoreDoubled');
-            updateTimer(p2, 'darknessTimer', 'isDarkness');
-        }
-        
-        function updateGameTimer(timestamp) {
-            if (gameMode === 'solo_classic') {
-                if (timestamp - lastTimerUpdateTime > 1000) {
-                    lastTimerUpdateTime = timestamp;
-                    timer = Math.floor((timestamp - startTime) / 1000);
-                    timerEl.textContent = timer + "s";
-                }
-            } else if (gameMode === 'solo_time_attack') {
-                let remainingMs = timeAttackDuration - (timestamp - startTime);
-                if (remainingMs <= 0) {
-                    timerEl.textContent = "0s";
-                    showGameOver(score1);
-                } else {
-                    timerEl.textContent = Math.ceil(remainingMs / 1000) + "s";
-                }
-            }
-        }
-
-        function levelUp() {
-            if (gameMode === 'tron_2p') return;
-            level++;
-            levelEl.textContent = level;
-            let speedIncrease = (difficulty === 'hard') ? 15 : 10;
-            moveInterval = Math.max(50, moveInterval - speedIncrease);
-            if (level % 2 === 0) spawnPowerUp();
-            spawnObstacle();
-            addAchievement(`Reached Level ${level}!`);
-        }
-
-        // ===== Game State Control =====
-        function gameLoop(timestamp) {
-            if (gameOver) { cancelAnimationFrame(gameLoopId); return; }
-            gameLoopId = requestAnimationFrame(gameLoop);
-            
-            if (gameRunning) {
-                const timeSinceLastUpdate = timestamp - lastUpdateTime;
-                updatePowerUpTimers(timeSinceLastUpdate);
-                updateGameTimer(timestamp);
+    <div id="instructions" class="ui-screen hidden">
+        <h1>How to Play</h1>
+        <div class="instructions-content">
+            <div>
+                <h2>GOAL</h2>
+                <p>Win the match based on the selected Game Mode (Health, Classic, Timed, or Sudden Death). Use power-ups to gain an advantage!</p>
                 
-                if (timeSinceLastUpdate > moveInterval) {
-                    lastUpdateTime = timestamp - (timeSinceLastUpdate % moveInterval);
-                    updateGame();
+                <h2>CONTROLS</h2>
+                <p><strong>Player 1 (Left Paddle):</strong><br/>Move: ARROW UP / ARROW DOWN<br/>Dash: RIGHT SHIFT (or LEFT SHIFT in 1P)<br/>Fire Laser: RIGHT CONTROL</p>
+                <p><strong>Player 2 (Right Paddle / 2P Mode):</strong><br/>Move: W / S<br/>Dash: LEFT SHIFT<br/>Fire Laser: SPACEBAR</p>
+                <p><strong>Game:</strong><br/>Pause / Resume: ESCAPE</p>
+                
+                <h2>ADVANCED MOVES</h2>
+                <ul>
+                    <li><strong>Spin:</strong> Hit the ball while your paddle is moving to add a curve.</li>
+                    <li><strong>Dash:</strong> A quick burst of speed on a 2-second cooldown.</li>
+                </ul>
+            </div>
+            <div>
+                <h2>POWER-UPS (Hit ball into them)</h2>
+                <ul>
+                    <li><strong>(M) Multiball:</strong> Spawns an extra ball.</li>
+                    <li><strong>(F) Fireball:</strong> Ball is worth 3 damage / points.</li>
+                    <li><strong>(S) Shrink:</strong> Makes opponent's paddle tiny.</li>
+                    <li><strong>(Z) Freeze:</strong> Freezes opponent for 2 seconds.</li>
+                    <li><strong>(?) Flip:</strong> Reverses opponent's controls.</li>
+                    <li><strong>(+) Shield:</strong> Blocks the next goal.</li>
+                    <li><strong>(L) Laser:</strong> Grants one laser shot.</li>
+                </ul>
+            </div>
+        </div>
+        <button onclick="Game.hideInstructions()" style="margin-top: 20px;">Back</button>
+    </div>
+    
+    <div id="pause-menu" class="ui-screen hidden">
+        <h1>PAUSED</h1>
+        <div class="btn-group">
+            <button onclick="Game.togglePause()">Resume</button>
+            <button onclick="Game.showInstructions(true, true)">How to Play</button>
+            <button onclick="Game.restart()">Restart</button>
+            <button onclick="Game.quitToMenu()">Back to Menu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * PONG DIMENSION X
+ */
+
+// --- GLOBAL SETTINGS & THEME ---
+const Settings = {
+    maxHealth: 10,
+    classicScore: 7,
+    timedDuration: 120, // 2 minutes
+    particlesEnabled: true,
+    screenShake: true,
+    colors: {},
+    
+    updateColors() {
+        const style = getComputedStyle(document.body);
+        this.colors = {
+            bg: style.getPropertyValue('--bg-color').trim(),
+            p1: style.getPropertyValue('--p1-color').trim(),
+            p1Health: style.getPropertyValue('--p1-health').trim(),
+            p2: style.getPropertyValue('--p2-color').trim(),
+            p2Health: style.getPropertyValue('--p2-health').trim(),
+            ball: style.getPropertyValue('--ball-color').trim(),
+            grid: style.getPropertyValue('--grid-color').trim(),
+            text: style.getPropertyValue('--text-color').trim(),
+            accent: style.getPropertyValue('--accent-color').trim(),
+            font: style.getPropertyValue('--font-main').trim()
+        };
+    }
+};
+
+document.querySelectorAll('.theme-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+        document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        document.body.className = swatch.dataset.theme;
+        Settings.updateColors();
+        if(!Game.running) Game.drawStaticBackground();
+    });
+});
+
+// --- AUDIO ENGINE ---
+const AudioFX = {
+    ctx: new (window.AudioContext || window.webkitAudioContext)(),
+    play(type, options = {}) {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 3000;
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        const { pitch = 1, volume = 1 } = options;
+        gain.gain.setValueAtTime(0.3 * volume, now);
+
+        switch(type) {
+            case 'hit':
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(200 * pitch, now);
+                osc.frequency.exponentialRampToValueAtTime(50 * pitch, now + 0.15);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start(now); osc.stop(now + 0.2);
+                break;
+            case 'wall':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(120 * pitch, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.15);
+                break;
+            case 'score':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.setValueAtTime(600, now + 0.1);
+                gain.gain.linearRampToValueAtTime(0.5, now + 0.1);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
+                break;
+             case 'powerup':
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.1 * volume, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                filter.frequency.value = 4000;
+                osc.start(now); osc.stop(now + 0.3);
+                break;
+             case 'dash':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(1500, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.2);
+                gain.gain.setValueAtTime(0.1 * volume, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+                break;
+            case 'countdown':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(pitch === 1 ? 800 : 400, now);
+                gain.gain.setValueAtTime(0.2 * volume, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+                break;
+            case 'laser':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.3);
+                gain.gain.setValueAtTime(0.2 * volume, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+                break;
+            case 'bumper':
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.4 * volume, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+                break;
+        }
+    }
+};
+
+// --- INPUT ---
+const Input = {
+    keys: {},
+    init() {
+        window.addEventListener('keydown', e => {
+            if (e.code === 'Escape') {
+                Game.togglePause();
+                return; // Don't register it as a key
+            }
+            this.keys[e.code] = true;
+        });
+        window.addEventListener('keyup', e => {
+            if (e.code !== 'Escape') {
+                this.keys[e.code] = false;
+            }
+        });
+    },
+    getAxis(upKey, downKey, dashKey, fireKey, reverse, isP1 = false) {
+        let axis = (this.keys[downKey] ? 1 : 0) - (this.keys[upKey] ? 1 : 0);
+        if (reverse) axis *= -1;
+        
+        // ** NEW DASH LOGIC **
+        // Check the primary dash key
+        let dash = this.keys[dashKey] || false;
+        // If P1 and in 1P mode, ALSO check LeftShift
+        if (isP1 && Game.playerMode === '1P' && this.keys['ShiftLeft']) {
+            dash = true;
+        }
+        
+        if (dash) {
+            this.keys[dashKey] = false; // Consume primary
+            if (isP1 && Game.playerMode === '1P') {
+                 this.keys['ShiftLeft'] = false; // Consume alternate
+            }
+        }
+        
+        let fire = this.keys[fireKey] || false;
+        if (fire) this.keys[fireKey] = false;
+        
+        return { axis, dash, fire };
+    }
+};
+
+// --- UTILITIES ---
+const lerp = (a, b, t) => a + (b - a) * t;
+const CircleRect = (c, r) => {
+    let testX = c.x;
+    let testY = c.y;
+    if (c.x < r.x) testX = r.x;
+    else if (c.x > r.x + r.w) testX = r.x + r.w;
+    if (c.y < r.y) testY = r.y;
+    else if (c.y > r.y + r.h) testY = r.y + r.h;
+    let distX = c.x - testX;
+    let distY = c.y - testY;
+    return (distX * distX + distY * distY) <= c.r * c.r;
+};
+
+// --- GAME OBJECTS ---
+class Paddle {
+    constructor(x, isAI) {
+        this.w = 16; this.baseH = 100; this.h = 100;
+        this.x = x; this.y = Game.h / 2 - this.h / 2;
+        this.targetY = this.y;
+        this.vy = 0;
+        this.speed = 10; // This is the LERP/smoothing factor
+        this.humanMoveSpeed = 450; // Pixels per second for human
+        this.health = Settings.maxHealth;
+        this.score = 0;
+        this.displayHealth = Settings.maxHealth;
+        this.isAI = isAI;
+        
+        this.aiConfig = { reaction: 0.1, error: 40 };
+        this.aiReactionTimer = 0;
+        this.aiMoveSpeed = 400; // Default AI speed
+        
+        this.squash = 1;
+        this.dashCooldown = 0;
+        this.dashMaxCooldown = 2.0;
+        
+        this.status = {
+            frozen: 0,
+            shrunk: 0,
+            controlsReversed: 0,
+            shield: false,
+            canFireLaser: false
+        };
+    }
+    
+    update(dt, input, ball) {
+        if (this.status.frozen > 0) {
+            this.status.frozen -= dt;
+            this.vy = 0;
+            return;
+        }
+        
+        if (this.isAI) this.updateAI(dt, ball);
+        else this.updateHuman(dt, input);
+        
+        this.dashCooldown -= dt;
+        if (this.status.shrunk > 0) {
+            this.h = 50; this.status.shrunk -= dt;
+        } else {
+            this.h = this.baseH;
+        }
+        if (this.status.controlsReversed > 0) this.status.controlsReversed -= dt;
+
+        // Calculate target velocity based on smoothing factor
+        this.vy = (this.targetY - this.y) * this.speed;
+
+        // ** AI SPEED CAP (pixels per second) **
+        if (this.isAI) {
+            // Cap the final velocity
+            this.vy = Math.max(-this.aiMoveSpeed * dt, Math.min(this.aiMoveSpeed * dt, this.vy * dt));
+        } else {
+            // Cap human velocity
+            this.vy = Math.max(-this.humanMoveSpeed * dt, Math.min(this.humanMoveSpeed * dt, this.vy * dt));
+        }
+
+        this.y += this.vy;
+        this.y = Math.max(10, Math.min(Game.h - this.h - 10, this.y));
+        
+        this.squash = lerp(this.squash, 1, 0.2);
+        this.displayHealth = lerp(this.displayHealth, this.health, 0.1);
+    }
+    
+    updateHuman(dt, input) {
+        if (input.dash && this.dashCooldown <= 0) {
+            this.dashCooldown = this.dashMaxCooldown;
+            let dashDir = input.axis !== 0 ? input.axis : (this.y > Game.h / 2 ? -1 : 1);
+            this.y += dashDir * 100;
+            AudioFX.play('dash');
+            Game.effects.push(new Shockwave(this.x, this.y + this.h/2, Settings.colors.accent, 0.5));
+            Game.startChromaticAberration(0.1, 5);
+            for(let i=0; i<5; i++) {
+                Game.particles.push(new Particle(this.x + this.w/2, this.y + (this.h/2) - (dashDir*i*20), this.isAI ? Settings.colors.p2 : Settings.colors.p1, 'dash'));
+            }
+        }
+        
+        if (input.fire && this.status.canFireLaser) {
+            this.status.canFireLaser = false;
+            AudioFX.play('laser');
+            let isP1 = this.x < Game.w / 2;
+            Game.lasers.push(new Laser(this.x + (isP1 ? this.w : 0), this.y + this.h/2, isP1 ? 1 : -1, isP1 ? Settings.colors.p1 : Settings.colors.p2));
+        }
+        
+        // ** UPDATED SPEED **
+        // Move the *target* position based on pixels-per-second speed
+        this.targetY += input.axis * this.humanMoveSpeed * dt;
+        this.targetY = Math.max(10, Math.min(Game.h - this.h - 10, this.targetY));
+    }
+
+    updateAI(dt, ball) {
+        this.aiReactionTimer -= dt;
+        if (this.aiReactionTimer <= 0) {
+            this.aiReactionTimer = this.aiConfig.reaction;
+            let targetBall = Game.balls.reduce((closest, b) => 
+                (b.vx > 0 && (this.x - b.x) < (this.x - (closest ? closest.x : -Infinity))) ? b : closest, null
+            );
+            if (!targetBall) targetBall = ball; // Failsafe if no ball is coming
+
+             if (targetBall && targetBall.vx > 0) {
+                 let timeToReach = (this.x - targetBall.x) / targetBall.vx;
+                 // Predict where the ball will be, plus or minus some error
+                 let predictedY = targetBall.y + (targetBall.vy * timeToReach);
+                 predictedY += (Math.random() - 0.5) * this.aiConfig.error;
+                 
+                 this.targetY = predictedY - this.h / 2;
+             } else {
+                 // Ball is not coming, return to center
+                 this.targetY = Game.h / 2 - this.h / 2;
+             }
+        }
+    }
+    
+    draw(ctx, color) {
+        const w = this.w / this.squash;
+        const h = this.h * this.squash;
+        const x = this.x - (w - this.w) / 2;
+        const y = this.y - (h - this.h) / 2;
+
+        ctx.fillStyle = this.status.frozen > 0 ? '#aaa' : color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 8);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        if (this.status.shield) {
+            ctx.strokeStyle = Settings.colors.accent;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(this.x > Game.w/2 ? this.x - 20 : this.x + 30, this.y - 10, 10, this.h + 20, 5);
+            ctx.stroke();
+        }
+        
+        if (this.status.canFireLaser) {
+            ctx.fillStyle = '#f00';
+            ctx.shadowColor = '#f00';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(this.x + this.w/2, this.y + this.h/2, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+    
+    takeDamage(dmg) {
+        if (this.status.shield) {
+            this.status.shield = false;
+            AudioFX.play('wall');
+            return;
+        }
+        
+        // Apply score/damage based on mode
+        if(Game.settings.mode === 'health' || Game.settings.mode === 'timed' || Game.settings.mode === 'sudden') {
+            this.health -= dmg;
+        }
+        if(Game.settings.mode === 'classic') {
+            // In classic mode, fireball is worth more points
+            this.score += dmg; 
+        }
+
+        Game.shake(0.3 + (dmg * 0.2));
+        Game.effects.push(new Shockwave(this.x > Game.w/2 ? Game.w : 0, Game.h/2, Settings.colors.accent, 1));
+        AudioFX.play('score');
+        if(dmg > 1) Game.startChromaticAberration(0.3, 10);
+    }
+}
+
+class Ball {
+    constructor(x, y, vx, vy) {
+        this.r = 10;
+        this.x = x || Game.w / 2;
+        this.y = y || Game.h / 2;
+        this.baseSpeed = 300;
+        this.maxSpeed = 800;
+        this.speed = this.baseSpeed;
+        
+        this.vx = vx || (Math.random() > 0.5 ? 1 : -1) * this.speed * Math.cos(Math.PI/4);
+        this.vy = vy || (Math.random() * 2 - 1) * this.speed * Math.sin(Math.PI/4);
+        
+        this.spinY = 0;
+        this.squash = 1;
+        this.status = 'normal';
+        this.trail = [];
+    }
+    
+    update(dt) {
+        this.vy += this.spinY * 200 * dt;
+        this.spinY = lerp(this.spinY, 0, 0.1);
+        
+        let currentSpeed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        if (this.status === 'fire') {
+            this.speed = Math.min(this.maxSpeed * 1.2, this.speed + 50 * dt);
+            if(Math.random() > 0.3) Game.particles.push(new Particle(this.x, this.y, '#f80', 'fire'));
+        } else {
+            this.speed = Math.min(this.maxSpeed, this.speed);
+            this.speed = lerp(this.speed, this.baseSpeed, 0.001);
+        }
+        if (currentSpeed > 0.1) {
+             this.vx = (this.vx / currentSpeed) * this.speed;
+             this.vy = (this.vy / currentSpeed) * this.speed;
+        }
+
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+
+        if ((this.y < this.r && this.vy < 0) || (this.y > Game.h - this.r && this.vy > 0)) {
+            this.y = this.y < this.r ? this.r : Game.h - this.r;
+            this.vy *= -1;
+            this.squash = 1.2;
+            Game.wallHit(this.x, this.y);
+        }
+        
+        this.squash = lerp(this.squash, 1, 0.2);
+        this.trail.push({x: this.x, y: this.y, status: this.status});
+        if (this.trail.length > 15) this.trail.shift();
+    }
+    
+    draw(ctx, color) {
+        for(let i = 0; i < this.trail.length; i++) {
+            let p = this.trail[i];
+            let alpha = (i / this.trail.length) * 0.5;
+            ctx.fillStyle = p.status === 'fire' ? `rgba(255, 100, 0, ${alpha})` : `rgba(255,255,255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, this.r * (i / this.trail.length), 0, Math.PI*2);
+            ctx.fill();
+        }
+        
+        const w = this.r * 2 * this.squash;
+        const h = this.r * 2 / this.squash;
+        let ballColor = this.status === 'fire' ? '#f80' : color;
+        ctx.fillStyle = ballColor;
+        ctx.shadowColor = ballColor;
+        ctx.shadowBlur = 25;
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y, w/2, h/2, 0, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+
+class PowerUp {
+    constructor() {
+        this.w = 30; this.h = 30;
+        this.x = Math.random() * (Game.w - 400) + 200;
+        this.y = Math.random() * (Game.h - 200) + 100;
+        this.life = 5 + Math.random() * 3;
+        
+        const types = ['multiball', 'fireball', 'shrink', 'freeze', 'flip', 'shield', 'laser'];
+        this.type = types[Math.floor(Math.random() * types.length)];
+        
+        this.colors = {
+            'multiball': '#ff0', 'fireball': '#f80', 'shrink': '#0f0',
+            'freeze': '#0af', 'flip': '#f0f', 'shield': '#0f0', 'laser': '#f00'
+        };
+        this.symbols = {
+            'multiball': 'M', 'fireball': 'F', 'shrink': 'S',
+            'freeze': 'Z', 'flip': '?', 'shield': '+', 'laser': 'L'
+        };
+    }
+    
+    update(dt) { this.life -= dt; }
+    
+    draw(ctx) {
+        let alpha = this.life < 1 ? this.life : 1;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = this.colors[this.type];
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.roundRect(this.x, this.y, this.w, this.h, 5);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.fillStyle = '#000';
+        // Use the new font
+        ctx.font = `bold 24px ${Settings.colors.font}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.symbols[this.type], this.x + this.w/2, this.y + this.h/2 + 2);
+        ctx.globalAlpha = 1;
+    }
+}
+
+class Laser {
+    constructor(x, y, dir, color) {
+        this.x = x; this.y = y; this.dir = dir;
+        this.w = 20; this.h = 4;
+        this.speed = 1000;
+        this.color = color;
+        this.life = 2; // 2 seconds
+    }
+    
+    update(dt) {
+        this.x += this.speed * this.dir * dt;
+        this.life -= dt;
+    }
+    
+    draw(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        ctx.fillRect(this.x, this.y - this.h/2, this.w * this.dir, this.h);
+        ctx.shadowBlur = 0;
+    }
+}
+
+class ArenaEntity {
+    constructor(x, y, w, h) {
+        this.x = x; this.y = y; this.w = w; this.h = h;
+    }
+    update(dt, balls) {}
+    draw(ctx) {}
+}
+
+class Obstacle extends ArenaEntity {
+    constructor(x, y, w, h) { super(x, y, w, h); }
+    update(dt, balls) {
+        for (const ball of balls) {
+            if (CircleRect(ball, this)) {
+                let overlapX = (ball.r + this.w/2) - Math.abs(ball.x - (this.x + this.w/2));
+                let overlapY = (ball.r + this.h/2) - Math.abs(ball.y - (this.y + this.h/2));
+
+                if (overlapX < overlapY) {
+                    ball.vx *= -1;
+                    ball.x = ball.x > this.x ? this.x + this.w + ball.r : this.x - ball.r;
+                } else {
+                    ball.vy *= -1;
+                    ball.y = ball.y > this.y ? this.y + this.h + ball.r : this.y - ball.r;
                 }
+                Game.wallHit(ball.x, ball.y);
+                ball.squash = 1.3;
+            }
+        }
+    }
+    draw(ctx) {
+        ctx.fillStyle = Settings.colors.grid;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+    }
+}
 
-                if (timestamp - lastObstacleUpdateTime > obstacleMoveInterval) {
-                    lastObstacleUpdateTime = timestamp;
-                    updateObstacles();
+class Bumper extends ArenaEntity {
+    constructor(x, y, r) {
+        super(x, y, r*2, r*2);
+        this.r = r;
+    }
+    
+    update(dt, balls) {
+        for (const ball of balls) {
+            const dx = ball.x - this.x;
+            const dy = ball.y - this.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist < ball.r + this.r) {
+                const normX = dx / dist;
+                const normY = dy / dist;
+                
+                const dot = ball.vx * normX + ball.vy * normY;
+                ball.vx = ball.vx - 2 * dot * normX;
+                ball.vy = ball.vy - 2 * dot * normY;
+                
+                ball.vx += normX * 500;
+                ball.vy += normY * 500;
+                
+                ball.speed = Math.min(ball.maxSpeed * 1.5, Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy));
+                ball.vx = (ball.vx / (ball.speed / 100)) * (ball.speed / 100);
+                ball.vy = (ball.vy / (ball.speed / 100)) * (ball.speed / 100);
+
+                ball.x = this.x + normX * (this.r + ball.r);
+                ball.y = this.y + normY * (this.r + ball.r);
+
+                AudioFX.play('bumper');
+                Game.effects.push(new Shockwave(this.x, this.y, Settings.colors.accent, 1));
+                ball.squash = 1.5;
+            }
+        }
+    }
+    
+    draw(ctx) {
+        ctx.fillStyle = Settings.colors.p1;
+        ctx.strokeStyle = Settings.colors.p2;
+        ctx.lineWidth = 5;
+        ctx.shadowColor = Settings.colors.accent;
+        ctx.shadowBlur = 20;
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
+}
+
+class GravityWell extends ArenaEntity {
+    constructor(x, y, strength) {
+        super(x, y, 0, 0);
+        this.strength = strength;
+        this.r = 100;
+    }
+    update(dt, balls) {
+        for (const ball of balls) {
+            let dx = this.x - ball.x;
+            let dy = this.y - ball.y;
+            let distSq = dx*dx + dy*dy;
+            if (distSq < this.r * this.r) {
+                let dist = Math.sqrt(distSq);
+                let force = (this.strength / (distSq + 100));
+                ball.vx += dx / dist * force * dt;
+                ball.vy += dy / dist * force * dt;
+            }
+        }
+    }
+    draw(ctx) {
+        ctx.strokeStyle = Settings.colors.accent;
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, Math.PI*2);
+        ctx.fillStyle = Settings.colors.accent;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+class Particle {
+    constructor(x, y, color, type = 'spark') {
+        this.x = x; this.y = y; this.color = color;
+        this.type = type;
+        this.life = 0.5 + Math.random() * 0.5;
+        this.maxLife = this.life;
+        
+        if (type === 'spark') {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = Math.random() * 200 + 50;
+            this.vx = Math.cos(angle) * speed;
+            this.vy = Math.sin(angle) * speed;
+            this.size = 2 + Math.random() * 3;
+        } else if (type === 'fire') {
+            this.vx = (Math.random() - 0.5) * 50;
+            this.vy = (Math.random() - 0.5) * 50;
+            this.size = 3 + Math.random() * 3;
+            this.life = 0.3 + Math.random() * 0.3;
+        } else if (type === 'dash') {
+            this.vx = (Math.random() - 0.5) * 20;
+            this.vy = (Math.random() - 0.5) * 20;
+            this.size = 5;
+            this.life = 0.2;
+        }
+    }
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= dt;
+        if (this.type === 'spark') this.vy += 200 * dt; // gravity
+    }
+    draw(ctx) {
+        let alpha = this.life / this.maxLife;
+        ctx.globalAlpha = alpha;
+        
+        if (this.type === 'fire') {
+            let r = 255; let g = 220 - (200 * (1-alpha)); let b = 0;
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.shadowColor = `rgb(${r},${g},${b})`;
+        } else if (this.type === 'dash') {
+            ctx.globalAlpha = alpha * 0.5;
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+        } else {
+             ctx.fillStyle = this.color;
+             ctx.shadowColor = this.color;
+        }
+        
+        ctx.shadowBlur = 10;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+    }
+}
+
+class Shockwave {
+    constructor(x, y, color, speed = 0.5) {
+        this.x = x; this.y = y; this.color = color;
+        this.radius = 0;
+        this.maxRadius = 100 * (speed * 2);
+        this.life = 1;
+        this.speed = speed;
+    }
+    update(dt) {
+        this.life -= dt * (this.speed * 2);
+        this.radius += (this.maxRadius - this.radius) * 0.1;
+    }
+    draw(ctx) {
+        if(this.life <= 0) return;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 5 * this.life;
+        ctx.globalAlpha = this.life;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+    }
+}
+
+
+// --- CORE GAME ENGINE ---
+const Game = {
+    canvas: document.getElementById('gameCanvas'),
+    ctx: document.getElementById('gameCanvas').getContext('2d'),
+    w: 1000, h: 650,
+    running: false,
+    paused: false,
+    playerMode: '1P',
+    instructionsCameFromPause: false, // NEW: For pause menu
+    settings: {
+        arena: 'classic',
+        mode: 'health',
+        ai: 'easy' // Default to easy
+    },
+    
+    p1: null, p2: null,
+    balls: [],
+    powerUps: [],
+    arenaEntities: [],
+    particles: [],
+    effects: [], // Shockwaves
+    lasers: [], // Laser projectiles
+    
+    shakeTimer: 0,
+    chromaTimer: 0,
+    chromaIntensity: 0,
+    powerUpTimer: 0,
+    countdown: 0,
+    gameTimer: 0,
+
+    init() {
+        Input.init();
+        Settings.updateColors();
+        this.drawStaticBackground();
+        this.lastTime = performance.now();
+        requestAnimationFrame(t => this.bgLoop(t));
+    },
+
+    selectSetting(type, value) {
+        this.settings[type] = value;
+        // Update UI
+        document.querySelectorAll(`.${type}-btn`).forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`${type}-${value}`).classList.add('active');
+    },
+
+    start(playerMode) {
+        this.playerMode = playerMode;
+        this.p1 = new Paddle(40, false); // P1 is never AI
+        this.p2 = new Paddle(this.w - 40 - 16, playerMode === '1P');
+        
+        // ** UPDATED AI DIFFICULTY **
+        if(this.p2.isAI) {
+            if(this.settings.ai === 'easy') {
+                this.p2.aiConfig = { reaction: 0.3, error: 150 }; // Slower reaction, larger error
+                this.p2.aiMoveSpeed = 250; // Slower move speed
+            }
+            if(this.settings.ai === 'medium') {
+                this.p2.aiConfig = { reaction: 0.2, error: 75 }; // Slightly easier medium
+                this.p2.aiMoveSpeed = 350; // Medium move speed
+            }
+            if(this.settings.ai === 'hard') {
+                this.p2.aiConfig = { reaction: 0.1, error: 30 }; // Hard remains tough
+                this.p2.aiMoveSpeed = 500; // Fast move speed
+            }
+        }
+        
+        // Apply Game Mode settings
+        this.balls = [];
+        this.powerUps = [];
+        this.particles = [];
+        this.effects = [];
+        this.lasers = [];
+        this.arenaEntities = [];
+        this.powerUpTimer = 5;
+        this.countdown = 3.5;
+        this.gameTimer = Settings.timedDuration;
+
+        if(this.settings.mode === 'health') {
+            this.p1.health = Settings.maxHealth; this.p2.health = Settings.maxHealth;
+        }
+        if(this.settings.mode === 'classic') {
+            this.p1.score = 0; this.p2.score = 0;
+        }
+        if(this.settings.mode === 'timed') {
+            this.p1.health = Settings.maxHealth; this.p2.health = Settings.maxHealth;
+        }
+        if(this.settings.mode === 'sudden') {
+            this.p1.health = 1; this.p2.health = 1;
+        }
+        
+        // Setup Arena
+        if (this.settings.arena === 'obstacle') {
+            this.arenaEntities.push(new Obstacle(this.w/2 - 50, this.h/2 - 10, 100, 20));
+        } else if (this.settings.arena === 'gravity') {
+            this.arenaEntities.push(new GravityWell(this.w/2, this.h/2, 20000));
+        } else if (this.settings.arena === 'pinball') {
+            this.arenaEntities.push(new Bumper(this.w/2 - 150, this.h/2 - 75, 25));
+            this.arenaEntities.push(new Bumper(this.w/2 + 150, this.h/2 + 75, 25));
+        }
+        
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('game-over').classList.add('hidden');
+        document.getElementById('instructions').classList.add('hidden');
+        document.getElementById('pause-menu').classList.add('hidden');
+        
+        this.running = true;
+        this.paused = false;
+        this.lastTime = performance.now();
+        requestAnimationFrame(t => this.loop(t));
+    },
+
+    bgLoop(now) {
+        if (!this.running) {
+             const dt = (now - this.lastTime) / 1000;
+             this.lastTime = now;
+             this.drawStaticBackground();
+             requestAnimationFrame(t => this.bgLoop(t));
+        }
+    },
+
+    loop(now) {
+        if (!this.running) return;
+        
+        const dt = Math.min((now - this.lastTime) / 1000, 0.05);
+        this.lastTime = now;
+        
+        if (!this.paused) {
+            this.update(dt);
+        }
+        this.draw();
+        
+        requestAnimationFrame(t => this.loop(t));
+    },
+
+    update(dt) {
+        if (this.shakeTimer > 0) this.shakeTimer -= dt;
+        if (this.chromaTimer > 0) this.chromaTimer -= dt;
+
+        if(this.settings.mode === 'timed') {
+            this.gameTimer -= dt;
+            if(this.gameTimer <= 0) {
+                this.gameTimer = 0;
+                let winner = this.p1.health > this.p2.health ? 1 : (this.p2.health > this.p1.health ? 2 : 0);
+                this.gameOver(winner);
+                return;
+            }
+        }
+
+        if(this.countdown > 0) {
+            let oldSec = Math.ceil(this.countdown);
+            this.countdown -= dt;
+            let newSec = Math.ceil(this.countdown);
+            if(newSec < oldSec) {
+                if(newSec > 0) AudioFX.play('countdown', { pitch: 0.5 });
+                else AudioFX.play('countdown', { pitch: 1 });
+            }
+            if(this.countdown <= 0) this.balls.push(new Ball());
+            return;
+        }
+        
+        // ** CONTROL SWAP LOGIC **
+        // P1 (Left): Arrows, R-Shift (L-Shift in 1P), R-Ctrl
+        let p1Input = Input.getAxis('ArrowUp', 'ArrowDown', 'ShiftRight', 'ControlRight', this.p1.status.controlsReversed > 0, true);
+        // P2 (Right): W/S, L-Shift, Space
+        let p2Input = Input.getAxis('KeyW', 'KeyS', 'ShiftLeft', 'Space', this.p2.status.controlsReversed > 0, false);
+        
+        this.p1.update(dt, p1Input, this.balls[0]);
+        this.p2.update(dt, p2Input, this.balls[0]);
+        
+        this.balls.forEach(ball => ball.update(dt));
+        this.arenaEntities.forEach(e => e.update(dt, this.balls));
+        
+        for (let i = this.balls.length - 1; i >= 0; i--) {
+            const ball = this.balls[i];
+            if(!ball) continue;
+            this.checkPaddleHit(ball, this.p1, 1);
+            this.checkPaddleHit(ball, this.p2, -1);
+            
+            if (ball.x < -20) this.score(this.p2, ball, i);
+            else if (ball.x > this.w + 20) this.score(this.p1, ball, i);
+            
+            for (let j = this.powerUps.length - 1; j >= 0; j--) {
+                if (CircleRect(ball, this.powerUps[j])) {
+                    this.activatePowerUp(this.powerUps[j], ball);
+                    this.powerUps.splice(j, 1);
+                    break;
                 }
             }
-            drawGame();
-        }
-
-        function pauseGame() {
-            if (gameOver || gameMode === 'menu') return;
-            gameRunning = !gameRunning;
-            if (gameRunning) {
-                pauseOverlay.style.display = "none";
-                pauseBtn.textContent = "Pause";
-                let pauseDuration = performance.now() - pauseTimestamp;
-                startTime += pauseDuration; // Add paused time to start time
-                lastUpdateTime = performance.now();
-                lastObstacleUpdateTime += pauseDuration;
-            } else {
-                pauseTimestamp = performance.now(); // Store when we paused
-                pauseOverlay.style.display = "flex";
-                pauseBtn.textContent = "Resume";
-            }
-        }
-
-        function resetGame() {
-            if (gameMode === 'menu') return;
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            initGame(gameMode);
-            startGame();
         }
         
-        function goToMenu() {
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            gameMode = 'menu'; gameOver = true; gameRunning = false;
-            menuOverlay.style.display = "flex";
-            gameOverOverlay.style.display = "none";
-            winnerOverlay.style.display = "none";
-            pauseOverlay.style.display = "none";
-            pauseBtn.disabled = true; resetBtn.disabled = true;
+        this.powerUpTimer -= dt;
+        if (this.powerUpTimer <= 0 && this.powerUps.length < 3) {
+            this.powerUpTimer = 3 + Math.random() * 4;
+            this.powerUps.push(new PowerUp());
         }
-
-        function showGameOver(finalScore) {
-            gameRunning = false; gameOver = true;
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            finalScoreEl.textContent = `Score: ${finalScore}`;
+        this.powerUps.forEach((p, i) => {
+            p.update(dt);
+            if (p.life <= 0) this.powerUps.splice(i, 1);
+        });
+        
+        [this.particles, this.effects, this.lasers].forEach(arr => {
+            for (let i = arr.length - 1; i >= 0; i--) {
+                arr[i].update(dt);
+                if (arr[i].life <= 0) arr.splice(i, 1);
+            }
+        });
+        
+        for (let i = this.lasers.length - 1; i >= 0; i--) {
+            const laser = this.lasers[i];
+            const target = laser.dir > 0 ? this.p2 : this.p1;
+            let lRect = {x: laser.dir > 0 ? laser.x : laser.x - laser.w, y: laser.y - laser.h/2, w: laser.w, h: laser.h};
+            if (CircleRect({x: lRect.x + lRect.w/2, y: lRect.y + lRect.h/2, r: lRect.h/2}, target)) {
+                target.status.frozen = 2;
+                this.lasers.splice(i, 1);
+                this.effects.push(new Shockwave(laser.x, laser.y, laser.color, 0.5));
+            }
+        }
+    },
+    
+    checkPaddleHit(ball, paddle, dir) {
+        if (CircleRect(ball, paddle)) {
+            ball.x = dir === 1 ? paddle.x + paddle.w + ball.r : paddle.x - ball.r;
             
-            // Only check high score for 1P modes
-            if ((gameMode === 'solo_classic' || gameMode === 'solo_time_attack') && finalScore > highScore) {
-                highScore = finalScore;
-                highScoreEl.textContent = highScore;
-                localStorage.setItem("snakeHighScore", highScore);
-                newHighScoreEl.style.display = "block";
-                addAchievement("New High Score!");
-            } else {
-                newHighScoreEl.style.display = "none";
-            }
-            gameOverOverlay.style.display = "flex";
-            pauseBtn.disabled = true;
-        }
-        
-        function showWinner(winner) {
-            gameRunning = false; gameOver = true;
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            let impact = (ball.y - (paddle.y + paddle.h/2)) / (paddle.h/2);
+            let angle = impact * Math.PI/4;
             
-            if (winner === 'p1') winnerMessageEl.textContent = "Player 1 Wins!";
-            else if (winner === 'p2') winnerMessageEl.textContent = "Player 2 Wins!";
-            else winnerMessageEl.textContent = "It's a Draw!";
+            ball.speed = Math.min(ball.maxSpeed, ball.speed + 30);
+            ball.vx = dir * Math.cos(angle) * ball.speed;
+            ball.vy = Math.sin(angle) * ball.speed;
+            ball.spinY = (paddle.vy / (paddle.speed * 10)) * 2;
             
-            winnerMessageEl.style.color = (winner === 'p1') ? 'var(--p1-color)' : (winner === 'p2') ? 'var(--p2-color)' : '#ff0';
-            winnerOverlay.style.display = "flex";
-            pauseBtn.disabled = true;
+            paddle.squash = 0.7; ball.squash = 1.3;
+            this.shake(0.1);
+            AudioFX.play('hit', { pitch: 1.2 - (ball.speed / ball.maxSpeed) });
+            this.spawnParticles(ball.x, ball.y, dir === 1 ? Settings.colors.p1 : Settings.colors.p2, 10);
+            this.effects.push(new Shockwave(ball.x, ball.y, dir === 1 ? Settings.colors.p1 : Settings.colors.p2, 0.3));
+            
+            if (ball.status === 'fire') {
+                ball.status = 'normal';
+                this.startChromaticAberration(0.1, 5);
+            }
         }
-
-        // ===== Achievements =====
-        function checkAchievements() {
-            const is1P = (gameMode === 'solo_classic' || gameMode === 'solo_time_attack');
-            if (!is1P) return;
-            if (score1 >= 1) addAchievement("First Bite!");
-            if (score1 >= 25) addAchievement("Snack Attacker!");
-            if (score1 >= 50) addAchievement("Pythonic!");
-            if (timer >= 120 && gameMode === 'solo_classic') addAchievement("2 Minute Survivor!");
+    },
+    
+    score(player, ball, ballIndex) {
+        let dmg = ball.status === 'fire' ? 3 : 1;
+        player.takeDamage(dmg);
+        
+        this.balls.splice(ballIndex, 1);
+        
+        if(this.settings.mode === 'health' || this.settings.mode === 'sudden') {
+            if (player.health <= 0) this.gameOver(player === this.p1 ? 2 : 1);
+        }
+        if(this.settings.mode === 'classic') {
+            if (player.score >= Settings.classicScore) this.gameOver(player === this.p1 ? 2 : 1);
         }
         
-        function addAchievement(text) {
-            const is1P = (gameMode === 'solo_classic' || gameMode === 'solo_time_attack');
-            if (achievements.has(text) || !is1P) return;
-            achievements.add(text);
-            localStorage.setItem("snakeAchievements", JSON.stringify(Array.from(achievements)));
-            const toast = document.createElement("div");
-            toast.className = "toast";
-            toast.textContent = "🏆 Achievement: " + text;
-            toastContainer.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
+        if (this.running && this.balls.length === 0) {
+            this.countdown = 2.5;
+        }
+    },
+    
+    activatePowerUp(powerUp, ball) {
+        AudioFX.play('powerup');
+        const owner = ball.vx > 0 ? this.p1 : this.p2;
+        const target = owner === this.p1 ? this.p2 : this.p1;
+        
+        switch(powerUp.type) {
+            case 'multiball':
+                this.balls.push(new Ball(ball.x, ball.y, -ball.vx, ball.vy + 100));
+                break;
+            case 'fireball':
+                ball.status = 'fire';
+                break;
+            case 'shrink':
+                target.status.shrunk = 5;
+                break;
+            case 'freeze':
+                target.status.frozen = 2;
+                break;
+            case 'flip':
+                target.status.controlsReversed = 5;
+                break;
+            case 'shield':
+                owner.status.shield = true;
+                break;
+            case 'laser':
+                owner.status.canFireLaser = true;
+                break;
+        }
+    },
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.w, this.h);
+        this.ctx.save();
+        if (this.shakeTimer > 0 && Settings.screenShake) {
+            let mag = this.shakeTimer * 15;
+            this.ctx.translate((Math.random()-0.5)*mag, (Math.random()-0.5)*mag);
+        }
+        
+        this.drawStaticBackground();
+        
+        this.arenaEntities.forEach(e => e.draw(this.ctx));
+        this.effects.forEach(e => e.draw(this.ctx));
+        
+        if(this.chromaTimer > 0) {
+            this.drawGameObjectsWithAberration();
+        } else {
+            this.p1.draw(this.ctx, Settings.colors.p1);
+            this.p2.draw(this.ctx, Settings.colors.p2);
+            this.particles.forEach(p => p.draw(this.ctx));
+            this.powerUps.forEach(p => p.draw(this.ctx));
+            this.balls.forEach(ball => ball.draw(this.ctx, Settings.colors.ball));
+            this.lasers.forEach(l => l.draw(this.ctx));
         }
 
-        // ===== Event Listeners =====
-        document.addEventListener("keydown", e => {
-            if (gameMode === 'menu' && (e.key === " " || e.key === "Enter")) {
-                initGame('solo_classic'); startGame();
+        this.drawHUD();
+        
+        if(this.countdown > 0) {
+            let num = Math.ceil(this.countdown);
+            if (num > 0) {
+                this.ctx.font = `bold 200px ${Settings.colors.font}`;
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${this.countdown - (num-1)})`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(num, this.w/2, this.h/2);
             }
-            if (!gameRunning) return;
-
-            if (gameMode === 'solo_classic' || gameMode === 'solo_time_attack') {
-                if (e.key === "ArrowUp" && direction1.y === 0) nextDirection1 = { x: 0, y: -1 };
-                else if (e.key === "ArrowDown" && direction1.y === 0) nextDirection1 = { x: 0, y: 1 };
-                else if (e.key === "ArrowLeft" && direction1.x === 0) nextDirection1 = { x: -1, y: 0 };
-                else if (e.key === "ArrowRight" && direction1.x === 0) nextDirection1 = { x: 1, y: 0 };
-            } 
-            else if (gameMode === 'versus_2p' || gameMode === 'tron_2p') {
-                if (e.key === "w" && direction1.y === 0) nextDirection1 = { x: 0, y: -1 };
-                else if (e.key === "s" && direction1.y === 0) nextDirection1 = { x: 0, y: 1 };
-                else if (e.key === "a" && direction1.x === 0) nextDirection1 = { x: -1, y: 0 };
-                else if (e.key === "d" && direction1.x === 0) nextDirection1 = { x: 1, y: 0 };
-                if (e.key === "ArrowUp" && direction2.y === 0) nextDirection2 = { x: 0, y: -1 };
-                else if (e.key === "ArrowDown" && direction2.y === 0) nextDirection2 = { x: 0, y: 1 };
-                else if (e.key === "ArrowLeft" && direction2.x === 0) nextDirection2 = { x: -1, y: 0 };
-                else if (e.key === "ArrowRight" && direction2.x === 0) nextDirection2 = { x: 1, y: 0 };
-            }
-            if (e.key === " " || e.key === "p") {
-                e.preventDefault();
-                pauseGame();
-            }
+        }
+        
+        this.ctx.restore();
+    },
+    
+    drawGameObjectsWithAberration() {
+        let intensity = this.chromaIntensity * (this.chromaTimer / 0.3);
+        this.ctx.globalCompositeOperation = 'lighter';
+        
+        [this.p1, this.p2, ...this.balls, ...this.lasers].forEach((obj, c) => {
+            let color = c === 0 ? '#f00' : (c === 1 ? '#0f0' : '#00f');
+            let offset = c === 0 ? -intensity : (c === 1 ? intensity : 0);
+            
+            this.ctx.save(); this.ctx.translate(offset, 0);
+            if (obj.draw) obj.draw(this.ctx, color);
+            this.ctx.restore();
         });
 
-        let touchStartX = 0, touchStartY = 0;
-        canvas.addEventListener("touchstart", (e) => {
-            if (gameMode === 'versus_2p' || gameMode === 'tron_2p') return;
-            e.preventDefault();
-            touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
-        }, { passive: false });
+        this.ctx.globalCompositeOperation = 'source-over';
+        
+        this.particles.forEach(p => p.draw(this.ctx));
+        this.powerUps.forEach(p => p.draw(this.ctx));
+    },
 
-        canvas.addEventListener("touchmove", (e) => {
-            if (gameMode === 'versus_2p' || gameMode === 'tron_2p' || !gameRunning || !touchStartX || !touchStartY) return;
-            e.preventDefault();
-            let touchEndX = e.touches[0].clientX, touchEndY = e.touches[0].clientY;
-            let dx = touchEndX - touchStartX, dy = touchEndY - touchStartY;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 10 && direction1.x === 0) nextDirection1 = { x: 1, y: 0 };
-                else if (dx < -10 && direction1.x === 0) nextDirection1 = { x: -1, y: 0 };
+    drawStaticBackground() {
+        this.ctx.fillStyle = Settings.colors.bg;
+        this.ctx.fillRect(0, 0, this.w, this.h);
+        
+        let pulse = (Math.sin(AudioFX.ctx.currentTime * 2) + 1) / 2;
+        this.ctx.strokeStyle = Settings.colors.grid;
+        this.ctx.globalAlpha = 0.5 + (pulse * 0.5);
+        this.ctx.lineWidth = 4;
+        this.ctx.setLineDash([15, 15]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.w/2, 0);
+        this.ctx.lineTo(this.w/2, this.h);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        this.ctx.globalAlpha = 1;
+    },
+    
+    drawHUD() {
+        this.ctx.font = `bold 24px ${Settings.colors.font}`;
+        
+        if (this.settings.mode === 'classic') {
+            this.ctx.font = `bold 80px ${Settings.colors.font}`;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillStyle = Settings.colors.p1;
+            this.ctx.fillText(this.p1.score, this.w/4, 80);
+            this.ctx.fillStyle = Settings.colors.p2;
+            this.ctx.fillText(this.p2.score, this.w*3/4, 80);
+        } else if (this.settings.mode === 'timed') {
+            this.drawHealthBars();
+            this.ctx.font = `bold 80px ${Settings.colors.font}`;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillStyle = Settings.colors.text;
+            let minutes = Math.floor(this.gameTimer / 60);
+            let seconds = Math.floor(this.gameTimer % 60);
+            this.ctx.fillText(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`, this.w/2, 80);
+        } else {
+            this.drawHealthBars();
+        }
+
+        this.drawDashMeter(this.w * 0.05, 50, this.w * 0.4, 5, this.p1, Settings.colors.p1Health);
+        this.drawDashMeter(this.w * 0.95 - (this.w * 0.4), 50, this.w * 0.4, 5, this.p2, Settings.colors.p2Health, true);
+    },
+    
+    drawHealthBars() {
+        const barWidth = this.w * 0.4;
+        const barHeight = 25;
+        
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillRect(this.w * 0.05, 20, barWidth, barHeight);
+        this.ctx.fillStyle = Settings.colors.p1Health;
+        let p1Health = this.settings.mode === 'sudden' ? this.p1.health : (this.p1.displayHealth / Settings.maxHealth);
+        this.ctx.fillRect(this.w * 0.05, 20, barWidth * p1Health, barHeight);
+        
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillRect(this.w * 0.95 - barWidth, 20, barWidth, barHeight);
+        this.ctx.fillStyle = Settings.colors.p2Health;
+        let p2Health = this.settings.mode === 'sudden' ? this.p2.health : (this.p2.displayHealth / Settings.maxHealth);
+        this.ctx.fillRect(this.w * 0.95 - (barWidth * p2Health), 20, barWidth * p2Health, barHeight);
+    },
+    
+    drawDashMeter(x, y, w, h, player, color, reverse = false) {
+        this.ctx.fillStyle = '#555';
+        this.ctx.fillRect(x, y, w, h);
+        let readyPercent = 1 - (player.dashCooldown / player.dashMaxCooldown);
+        if (player.dashCooldown <= 0) {
+            this.ctx.fillStyle = Settings.colors.accent;
+            this.ctx.fillRect(x, y, w, h);
+        } else {
+            this.ctx.fillStyle = color;
+            if(reverse) {
+                this.ctx.fillRect(x + w * (1 - readyPercent), y, w * readyPercent, h);
             } else {
-                if (dy > 10 && direction1.y === 0) nextDirection1 = { x: 0, y: 1 };
-                else if (dy < -10 && direction1.y === 0) nextDirection1 = { x: 0, y: -1 };
+                this.ctx.fillRect(x, y, w * readyPercent, h);
             }
-            touchStartX = 0; touchStartY = 0;
-        }, { passive: false });
+        }
+    },
 
-        pauseBtn.addEventListener("click", pauseGame);
-        resumeBtn.addEventListener("click", pauseGame);
-        resetBtn.addEventListener("click", resetGame);
-        restartBtn.addEventListener("click", () => { initGame(gameMode); startGame(); }); // Restart same mode
-        menuBtn.addEventListener("click", goToMenu);
-        restartBtn2P.addEventListener("click", () => { initGame(gameMode); startGame(); }); // Restart same mode
-        menuBtn2P.addEventListener("click", goToMenu);
-        
-        // NEW Menu Button Listeners
-        modeSoloClassicBtn.addEventListener("click", () => { initGame('solo_classic'); startGame(); });
-        modeSoloTimeAttackBtn.addEventListener("click", () => { initGame('solo_time_attack'); startGame(); });
-        modeVersus2PBtn.addEventListener("click", () => { initGame('versus_2p'); startGame(); });
-        modeTron2PBtn.addEventListener("click", () => { initGame('tron_2p'); startGame(); });
-        
-        difficultyBtn.addEventListener("click", () => {
-            if (difficulty === 'normal') difficulty = 'hard';
-            else if (difficulty === 'hard') difficulty = 'easy';
-            else difficulty = 'normal';
-            difficultyBtn.textContent = `Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`;
-        });
-        
-        wrapBtn.addEventListener("click", () => {
-            wrapAround = !wrapAround;
-            wrapBtn.textContent = "Wrap: " + (wrapAround ? "ON" : "OFF");
-        });
-        
-        paletteBtn.addEventListener("click", () => {
-            let currentIndex = themeKeys.indexOf(currentThemeKey);
-            currentIndex = (currentIndex + 1) % themeKeys.length;
-            currentThemeKey = themeKeys[currentIndex];
-            const theme = themes[currentThemeKey];
-            paletteBtn.textContent = `Palette: ${theme.name}`;
-            document.body.className = theme.cssClass;
-            drawGame();
-        });
-        
-        showInstrBtn.addEventListener("click", () => instructionsOverlay.style.display = "flex");
-        closeInstrBtn.addEventListener("click", () => instructionsOverlay.style.display = "none");
+    spawnParticles(x, y, color, count = 10, type = 'spark') {
+        if (!Settings.particlesEnabled) return;
+        for(let i = 0; i < count; i++) {
+            this.particles.push(new Particle(x, y, color, type));
+        }
+    },
+    
+    wallHit(x, y) {
+        AudioFX.play('wall');
+        this.spawnParticles(x, y, Settings.colors.ball, 3);
+    },
 
-        // ===== Start =====
-        drawGame();
-        goToMenu();
+    shake(duration) { this.shakeTimer = Math.max(this.shakeTimer, duration); },
+    startChromaticAberration(duration, intensity) {
+        this.chromaTimer = Math.max(this.chromaTimer, duration);
+        this.chromaIntensity = Math.max(this.chromaIntensity, intensity);
+    },
+    
+    togglePause() {
+        if (!this.running) return;
+        this.paused = !this.paused;
+        document.getElementById('pause-menu').classList.toggle('hidden', !this.paused);
+        // Resync lastTime when unpausing
+        if (!this.paused) {
+             this.lastTime = performance.now();
+        }
+    },
 
-    </script>
+    gameOver(winnerNum) {
+        this.running = false;
+        this.paused = false;
+        let text = "IT'S A DRAW!";
+        if (winnerNum === 1) text = "PLAYER 1 WINS";
+        if (winnerNum === 2) text = this.playerMode === '1P' ? "COMPUTER WINS" : "PLAYER 2 WINS";
+        
+        document.getElementById('winner-text').innerText = text;
+        document.getElementById('game-over').classList.remove('hidden');
+        requestAnimationFrame(t => this.bgLoop(t));
+    },
+
+    showMenu() {
+        this.running = false;
+        this.paused = false;
+        document.getElementById('game-over').classList.add('hidden');
+        document.getElementById('instructions').classList.add('hidden');
+        document.getElementById('pause-menu').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+        requestAnimationFrame(t => this.bgLoop(t));
+    },
+    
+    quitToMenu() {
+        this.running = false;
+        this.paused = false;
+        document.getElementById('pause-menu').classList.add('hidden');
+        this.showMenu();
+    },
+    
+    showInstructions(show, fromPause = false) {
+        this.instructionsCameFromPause = fromPause;
+        if (fromPause) {
+            document.getElementById('pause-menu').classList.add('hidden');
+        } else {
+            document.getElementById('main-menu').classList.add('hidden');
+        }
+        document.getElementById('instructions').classList.remove('hidden');
+    },
+    
+    hideInstructions() {
+        document.getElementById('instructions').classList.add('hidden');
+        if (this.instructionsCameFromPause) {
+            document.getElementById('pause-menu').classList.remove('hidden');
+            this.instructionsCameFromPause = false;
+        } else {
+            document.getElementById('main-menu').classList.remove('hidden');
+        }
+    },
+    
+    restart() { 
+        this.paused = false;
+        document.getElementById('pause-menu').classList.add('hidden');
+        this.start(this.playerMode); 
+    }
+};
+
+// Polyfills
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
+        this.moveTo(x+r, y);
+        this.arcTo(x+w, y,   x+w, y+h, r);
+        this.arcTo(x+w, y+h, x,   y+h, r);
+        this.arcTo(x,   y+h, x,   y,   r);
+        this.arcTo(x,   y,   x+w, y,   r);
+        this.closePath(); return this;
+    };
+}
+if (!CanvasRenderingContext2D.prototype.ellipse) {
+    CanvasRenderingContext2D.prototype.ellipse = function(x, y, radiusX, radiusY, rotation, startAngle, endAngle, antiClockwise) {
+        this.save();
+        this.translate(x, y);
+        this.rotate(rotation);
+        this.scale(radiusX, radiusY);
+        this.arc(0, 0, 1, startAngle, endAngle, antiClockwise);
+        this.restore();
+    };
+}
+
+// Start
+Game.init();
+
+</script>
 </body>
 </html>
